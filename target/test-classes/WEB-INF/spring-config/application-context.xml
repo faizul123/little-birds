@@ -22,6 +22,7 @@
 	    <property name="models">
 	       <list>
 				<value>com.srvy.model.User</value>
+				<value>com.srvy.model.Profile</value>
 		   </list>
 	    </property>
 	</bean>
