@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.srvy.dao.ObjectifyUtil;
-import com.srvy.model.Credential;
+import com.srvy.request.model.Credential;
+import com.srvy.request.model.SignupInfo;
 
 
 @RestController
@@ -24,6 +25,17 @@ public class UserService {
 	
 	private ObjectifyUtil ofyUtil;
 	
+	@RequestMapping(value="/signup",method=RequestMethod.POST,consumes=MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<String,Object>> signup(@RequestBody SignupInfo signupInfo){
+		Map<String,Object> map = new HashMap<String,Object>();
+		HttpStatus status = HttpStatus.OK;		
+		map.put("message", "Successfully login");
+		map.put("code", status.value());
+		log.warning("username " + signupInfo.getEmailId());
+		return new ResponseEntity<Map<String,Object>>(map,status);
+	}
+	
+	
 	@RequestMapping(value="/signin",method=RequestMethod.POST,consumes=MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String,Object>> login(@RequestBody Credential credential){
 		Map<String,Object> map = new HashMap<String,Object>();
@@ -33,5 +45,7 @@ public class UserService {
 		log.warning("username " + credential.getUsername());
 		return new ResponseEntity<Map<String,Object>>(map,status);
 	}
+	
+	
 	
 }

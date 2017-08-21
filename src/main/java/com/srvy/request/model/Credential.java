@@ -1,4 +1,4 @@
-package com.srvy.model;
+package com.srvy.request.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
