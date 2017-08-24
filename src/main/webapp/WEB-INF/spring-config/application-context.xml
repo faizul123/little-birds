@@ -14,8 +14,12 @@
 	
 	<mvc:annotation-driven/>
 	
-	<bean class="com.srvy.dao.impl.UserDaoImpl">
-	    <constructor-arg ref="ofyUtil" />
+	<bean id="daoFactory" class="com.srvy.dao.DaoFactory" scope="prototype">
+	    <property name="daoMap">
+	        <map>
+				<entry key="com.srvy.dao.inf.UserDao" value="com.srvy.dao.impl.UserDaoImpl" />
+			</map>
+	    </property>
 	</bean>
 	
 	<bean id="ofyUtil" class="com.srvy.dao.ObjectifyUtil">

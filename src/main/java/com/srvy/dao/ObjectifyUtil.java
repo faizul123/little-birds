@@ -2,6 +2,7 @@ package com.srvy.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.InitializingBean;
 
@@ -14,10 +15,16 @@ public class ObjectifyUtil implements InitializingBean {
 	
 	@Override
 	public void afterPropertiesSet() throws ClassNotFoundException{
+		long start = System.currentTimeMillis(),end=0;
+		Logger.getLogger("").warning("Model scanning started...");
 		for(String model : models){
 			Class<?> clazz = Class.forName(model);
 			ObjectifyService.register(clazz);
-		}		
+		}
+		end = System.currentTimeMillis();
+		Logger.getLogger("").warning("Model scanning completed ... " + (end-start) + " in ms");
+		Logger.getLogger("").warning("Total models : " + models.size());
+		Logger.getLogger("").warning("models : " + models);
 	}
 	
 	public Objectify getObjectify(){

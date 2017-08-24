@@ -4,6 +4,8 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Unindex;
+import com.srvy.request.model.SignupInfo;
+import com.srvy.util.Utility;
 
 @Entity
 @Index
@@ -16,6 +18,16 @@ public class User {
 	
 	@Unindex
 	private String password;
+	
+	public User() {
+		
+	}
+	
+	public User(SignupInfo info){
+		this.id = Utility.randomUUID();
+		this.username = info.getEmailId();
+		setPassword(info.getPassword());
+	}
 
 	public String getId() {
 		return id;
@@ -38,7 +50,8 @@ public class User {
 	}
 
 	public void setPassword(String password) {
-		this.password = password;
+		
+		this.password = Utility.SHA256HEX.doHash(password);
 	}
 	
 }
