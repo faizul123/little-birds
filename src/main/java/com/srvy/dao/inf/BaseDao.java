@@ -15,6 +15,8 @@ public interface BaseDao {
 	
 	<T> List<T> writeBatch(List<T> models);
 	
+	<T> void writeBatch(Object...t);
+	
 	<T> T writeMO(T model);
 	
 	public boolean isRecordFound();
@@ -24,5 +26,7 @@ public interface BaseDao {
 	public boolean isWriteSuccess();
 	
 	public boolean isWriteFailure();
+	
+	public void reset();
 	
 }

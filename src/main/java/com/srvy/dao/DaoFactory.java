@@ -8,11 +8,17 @@ import java.util.logging.Logger;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
 
-
+/**
+ * The centralized access to all the dao managers to interact with <br/> 
+ * various kind in this application.All DAO are instantiated with <br/>
+ * single {@code Objectify} instance.
+ * Note: This DaoFactory is a Spring Bean
+ * @author Faizul
+ *
+ */
 public class DaoFactory {
 
-	// To hold interface and Impl 
-	private Map<String,String> daoMap = new ConcurrentHashMap<String,String>();
+	private Map<String,String> daoMap = new ConcurrentHashMap<String,String>(); // To hold interface and Impl
 	
 	public DaoFactory() {
 		Logger.getLogger("").warning("Initializing DaoFactory...");

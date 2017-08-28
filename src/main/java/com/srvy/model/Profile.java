@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import com.srvy.request.model.SignupInfo;
 
 @Entity
 @Index
@@ -15,6 +16,8 @@ public class Profile {
 	
 	private String id;
 	
+	private String emailId;
+	
 	private String fistName;
 	
 	private String lastName;
@@ -23,10 +26,22 @@ public class Profile {
 	
 	private long age;
 	
+	private String aboutMe;
+	
+	private String imageURL;
+	
+	private String location;
+	
 	public Profile() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
+	public Profile(User user,SignupInfo info){
+		this(info.getName(), info.getDob());
+		setAboutMe(info.getAboutMe());
+		id = user.getId();
+		uuid = id;
+	}
 	
 	public Profile(String name ,long dob){
 		updateName(name);
@@ -92,7 +107,33 @@ public class Profile {
 	public void setAge(long age) {
 		this.age = age;
 	}
+
+	public String getImageURL() {
+		return imageURL;
+	}
+
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
+	}
+
+	public String getAboutMe() {
+		return aboutMe;
+	}
+
+	public void setAboutMe(String aboutMe) {
+		this.aboutMe = aboutMe;
+	}
+
+	public String getEmailId() {
+		return emailId;
+	}
+
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
 	
-	
+	public String getName(){
+		return this.fistName + " " + this.lastName;
+	}
 	
 }

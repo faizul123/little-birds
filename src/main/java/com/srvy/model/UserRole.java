@@ -1,14 +1,14 @@
 package com.srvy.model;
 
-public class Score {
+public class UserRole {
 
 	private String uuid;
 	
 	private String id;
 	
-	private String surveyId;
+	private String userId;
 	
-	private long score;
+	private String roleId;
 	
 	private long createdTime;
 	

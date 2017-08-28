@@ -1,9 +1,10 @@
 package com.srvy.rest;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,11 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.srvy.dao.DaoFactory;
 import com.srvy.dao.inf.UserDao;
+import com.srvy.exception.ServiceFailureException;
 import com.srvy.exception.ValidationException;
+import com.srvy.model.Profile;
 import com.srvy.model.User;
 import com.srvy.model.factory.ModelFactory;
 import com.srvy.request.model.Credential;
 import com.srvy.request.model.SignupInfo;
+import com.srvy.util.Response;
 
 
 @RestController
@@ -41,31 +45,54 @@ public class UserService {
 		if(userDao.isRecordFound()){
 			throw new ValidationException(400, "Account already exist!");
 		}
-		else{
-			ModelFactory moFactory = new ModelFactory();
-			User user = moFactory.newUser(signupInfo);
-			userDao.writeMO(user);
+		else{			
+			ModelFactory moFactory = new ModelFactory(); // Used to construct model from the request object
+						
+			User user = moFactory.newUser(signupInfo);	// Building user model
+					
+			Profile profile = moFactory.newProfile(user, signupInfo); //Building profile model
+			
+			userDao.writeBatch(user,profile);			// store into db
+			
+			if(userDao.isWriteSuccess()){		
+			
+				return Response.newBuilder()
+						.add("message","Successfully your account has been created!")
+						.add("code",HttpStatus.OK)
+						.build();
+			}else{
+				throw new ServiceFailureException("");
+			}
 		}
-		Map<String,Object> map = new HashMap<String,Object>();
-		HttpStatus status = HttpStatus.OK;		
-		map.put("message", "Successfully login");
-		map.put("code", status.value());
-		log.warning("username " + signupInfo.getEmailId());
-		return new ResponseEntity<Map<String,Object>>(map,status);
 	}
 	
 	
 	@RequestMapping(value="/signin",method=RequestMethod.POST,consumes=MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Map<String,Object>> login(@RequestBody Credential credential) throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+	public ResponseEntity<Map<String,Object>> login(HttpServletRequest request,@RequestBody Credential credential) throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
 		log.warning("dao " + daoFactory.toString());
 		UserDao userDao = daoFactory.getDao(UserDao.class);
-		userDao.findUser("");
-		Map<String,Object> map = new HashMap<String,Object>();
-		HttpStatus status = HttpStatus.OK;		
-		map.put("message", "Successfully login");
-		map.put("code", status.value());
-		log.warning("username " + credential.getUsername());
-		return new ResponseEntity<Map<String,Object>>(map,status);
+		User user = userDao.findUser(credential.getUsername());
+		
+		if(userDao.isRecordFound()){
+			if(user.isPasswordMatch(credential)){				
+				Profile profile = userDao.getProfile(user);				
+				return Response
+						.newBuilder()
+							.add("message", "Hi " + profile.getName() + ", you have been successfully login!")
+							.add("profile",profile)
+						.newSession(request)
+							.addAttribute("name", profile.getName())
+							.addAttribute("username",profile.getEmailId())
+							.addAttribute("userId", profile.getId())
+							.done()
+						.build();
+				
+			}else{
+				throw new ValidationException(400, "Password is wrong!");
+			}
+		}
+		
+		return Response.newBuilder().build();
 	}
 	
 	

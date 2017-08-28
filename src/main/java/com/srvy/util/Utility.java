@@ -5,14 +5,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 public class Utility {
 	
 	public static Sha256Hex SHA256HEX = new Sha256Hex();
+	
+	public static final int MAX_LIMIT = 10;
 
 	public static <T> boolean isNullOrEmpty(List<T> list){
 		return (list == null || list.isEmpty());
@@ -68,6 +74,60 @@ public class Utility {
 		}
 		buffer.flush();
 		return buffer.toByteArray();
+	}
+	
+	public static String toSlug(String content){
+		content = content.trim().toLowerCase();
+		content = Normalizer.normalize(content, Form.NFD);
+		Pattern NONLATIN_without_hyphen = Pattern.compile("[^\\w]");
+		Pattern NONLATIN = Pattern.compile("[^\\w-]");
+		Pattern WHITESPACE = Pattern.compile("[\\s]");
+		String[] words = content.split(" ");
+		ArrayList<String> resultWords = new ArrayList<String>();
+		int length = words.length;
+		int index = 0;
+		for (String s : words) {
+	
+			if (index < length) {
+				s = NONLATIN_without_hyphen.matcher(s).replaceAll("");
+				String withoutspaces = "";
+				for (int i = 0; i < s.length(); i++) {
+					if (s.charAt(i) != ' ')
+						if (s.charAt(i) != '_')
+							withoutspaces += s.charAt(i);
+				}
+	
+				if (withoutspaces != "") {
+					resultWords.add(withoutspaces);
+				}
+				index++;
+			}
+	
+		}
+		content = "";
+		for (String text : resultWords) {
+			content += text + " ";
+		}
+		content = WHITESPACE.matcher(content).replaceAll("-");
+		content = NONLATIN.matcher(content).replaceAll("");
+		content = content.substring(0,content.length()-1);
+		return content;	
+	}
+
+	public static int getOffSet(int pageNumber,int limit){
+		limit = checkLimit(limit);
+		if (pageNumber < 0) {
+			pageNumber = 1;
+		}
+		
+		return (pageNumber - 1) * limit;
+	}
+	
+	public static int checkLimit(int limit){
+		if (limit > MAX_LIMIT){
+			limit = MAX_LIMIT;
+		}
+		return limit;
 	}
 	
 	
