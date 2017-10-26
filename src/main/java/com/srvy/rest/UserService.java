@@ -1,6 +1,8 @@
 package com.srvy.rest;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,16 +22,22 @@ import com.srvy.dao.DaoFactory;
 import com.srvy.dao.inf.UserDao;
 import com.srvy.exception.ServiceFailureException;
 import com.srvy.exception.ValidationException;
+import com.srvy.helpers.UserRestHelper;
 import com.srvy.model.Profile;
 import com.srvy.model.User;
+import com.srvy.model.UserTopics;
 import com.srvy.model.factory.ModelFactory;
 import com.srvy.request.model.Credential;
 import com.srvy.request.model.SignupInfo;
+import com.srvy.util.AppConstants;
 import com.srvy.util.Response;
 
 
 @RestController
-@RequestMapping(consumes=MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(
+value=AppConstants.ROOT_API,
+consumes=MediaType.APPLICATION_JSON_VALUE,
+produces=MediaType.APPLICATION_JSON_VALUE)
 public class UserService {
 
 	private final Logger log = Logger.getLogger("");
@@ -42,6 +51,7 @@ public class UserService {
 		
 		UserDao userDao = daoFactory.getDao(UserDao.class);
 		userDao.findUser(signupInfo.getEmailId());
+		
 		if(userDao.isRecordFound()){
 			throw new ValidationException(400, "Account already exist!");
 		}
@@ -50,9 +60,14 @@ public class UserService {
 						
 			User user = moFactory.newUser(signupInfo);	// Building user model
 					
-			Profile profile = moFactory.newProfile(user, signupInfo); //Building profile model
+			Profile profile = moFactory.newProfile(user, signupInfo); //Building profile model			
 			
-			userDao.writeBatch(user,profile);			// store into db
+			List<UserTopics> userTopics = moFactory.createUserTopics(user, signupInfo.getTopics());
+			List<Object> objects = new ArrayList<Object>();
+			objects.addAll(userTopics);
+			objects.add(user);
+			objects.add(profile);
+			userDao.writeBatch(objects);			// store into db
 			
 			if(userDao.isWriteSuccess()){		
 			
@@ -67,7 +82,7 @@ public class UserService {
 	}
 	
 	
-	@RequestMapping(value="/signin",method=RequestMethod.POST,consumes=MediaType.APPLICATION_JSON_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value="/signin",method=RequestMethod.POST)
 	public ResponseEntity<Map<String,Object>> login(HttpServletRequest request,@RequestBody Credential credential) throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
 		log.warning("dao " + daoFactory.toString());
 		UserDao userDao = daoFactory.getDao(UserDao.class);
@@ -85,16 +100,37 @@ public class UserService {
 							.addAttribute("username",profile.getEmailId())
 							.addAttribute("userId", profile.getId())
 							.done()
-						.build();
+						.build();				
 				
 			}else{
 				throw new ValidationException(400, "Password is wrong!");
 			}
+		}else{
+			throw new ValidationException(400,"Username is wrong!");
 		}
 		
-		return Response.newBuilder().build();
+		
 	}
 	
+	@RequestMapping(value="/profile/{identifier}",method=RequestMethod.GET,consumes=MediaType.ALL_VALUE)
+	public ResponseEntity<Map<String,Object>> getProfile(HttpServletRequest request,@PathVariable("identifier") String identifier) throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		UserDao userDao = daoFactory.getDao(UserDao.class);
+		UserRestHelper helper = new UserRestHelper();
+		if(identifier.equals("me")){			
+			User user = helper.getLoginUser(request, userDao);
+			Profile profile = userDao.getProfile(user);
+			return Response.newBuilder().add("profile", profile).build();
+		}else{
+			User user = userDao.getUser(identifier);
+			Profile profile = userDao.getProfile(user);
+			return Response.newBuilder().add("profile", profile).build();
+		}
+	}
 	
+	@RequestMapping(value="/signout",method=RequestMethod.GET,consumes = MediaType.ALL_VALUE)
+	public ResponseEntity<Map<String,Object>> signOut(HttpServletRequest request){
+		new UserRestHelper().clearSession(request);
+		return Response.newBuilder().add("message", "Successfully cleared!").build();
+	}
 	
 }

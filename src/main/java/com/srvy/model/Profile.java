@@ -2,6 +2,7 @@ package com.srvy.model;
 
 import java.util.concurrent.TimeUnit;
 
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
@@ -32,6 +33,8 @@ public class Profile {
 	
 	private String location;
 	
+	private Ref<Plan> plan;
+	
 	public Profile() {
 		
 	}
@@ -55,9 +58,16 @@ public class Profile {
 	}
 	
 	private void updateAge(long dob){
-		this.age = (dob - System.currentTimeMillis()) / (TimeUnit.MILLISECONDS.toDays(1000));
+		try{
+			this.age = (dob - System.currentTimeMillis()) / (TimeUnit.MILLISECONDS.toDays(1000));
+		}catch(ArithmeticException e){
+			this.age = 25;
+		}
 	}
 
+	public static void main(String[] args) {
+		System.out.println(System.currentTimeMillis());
+	}
 
 	public String getFistName() {
 		return fistName;

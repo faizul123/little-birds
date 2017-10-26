@@ -1,6 +1,7 @@
 package com.srvy.model;
 
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Unindex;
 import com.srvy.util.Utility;
@@ -10,6 +11,7 @@ import com.srvy.util.Utility;
 @Index
 public class Topic {
 
+	@Id
 	private String uuid;
 	
 	private String id;

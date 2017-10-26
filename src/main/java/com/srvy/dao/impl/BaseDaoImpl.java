@@ -2,6 +2,7 @@ package com.srvy.dao.impl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
@@ -10,6 +11,8 @@ import com.srvy.dao.inf.BaseDao;
 public abstract class BaseDaoImpl implements BaseDao {
 
 	Result result = Result.NONE;
+	
+	Logger log = Logger.getLogger("");
 	
 	public boolean isRecordFound(){
 		return result == Result.RECORD_FOUND;
@@ -20,6 +23,7 @@ public abstract class BaseDaoImpl implements BaseDao {
 	}
 	
 	public boolean isWriteSuccess(){
+		log.warning("DB Ops : "+ result);
 		return result == Result.WRITE_SUCCESS;
 	}
 	
@@ -58,19 +62,21 @@ public abstract class BaseDaoImpl implements BaseDao {
 			result = Result.WRITE_SUCCESS;
 			return models;
 		}catch(Exception e){
+			log.warning(e.toString());
 			result = Result.WRITE_FAILURE;
 		}
 		return Collections.emptyList();
 	}
 	
 	 @Override
-	public void  writeBatch(Object... t) {
+	public void writeBatch(Object...t) {
 		try{
 			Objectify ofy = ObjectifyService.ofy();
 			ofy.save().entities(t).now();
 			ofy.flush();
 			result = Result.WRITE_SUCCESS;
 		}catch(Exception e){
+			log.warning(e.toString());
 			result = Result.WRITE_FAILURE;
 		}
 	}

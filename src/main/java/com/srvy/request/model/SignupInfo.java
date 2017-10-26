@@ -2,8 +2,6 @@ package com.srvy.request.model;
 
 import java.util.List;
 
-import com.srvy.model.Topic;
-
 public class SignupInfo {
 
 	private String name;
@@ -16,7 +14,7 @@ public class SignupInfo {
 	
 	private String aboutMe;
 	
-	private List<Topic> topics;
+	private List<TopicInfo> topics;
 
 	public String getName() {
 		return name;
@@ -58,11 +56,11 @@ public class SignupInfo {
 		this.aboutMe = aboutMe;
 	}
 
-	public List<Topic> getTopics() {
+	public List<TopicInfo> getTopics() {
 		return topics;
 	}
 
-	public void setTopics(List<Topic> topics) {
+	public void setTopics(List<TopicInfo> topics) {
 		this.topics = topics;
 	}
 	

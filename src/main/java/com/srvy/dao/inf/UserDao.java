@@ -22,6 +22,8 @@ public interface UserDao extends BaseDao {
 	 */
 	public User findUser(String username);
 	
+	public User getUser(String userId);
+	
 	public Profile getProfile(User user);
 	
 }

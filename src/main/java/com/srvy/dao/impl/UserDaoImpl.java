@@ -16,7 +16,13 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
 
 	@Override
 	public User findUser(String username) {
-		Key<User> userKey = Key.create(User.class, username);
+		User user = ofy.load().type(User.class).filter("username", username).first().now();
+		result = (user == null ? Result.NO_RECORD_FOUND : Result.RECORD_FOUND);
+		return user;
+	}
+	
+	public User getUser(String userId){
+		Key<User> userKey = Key.create(User.class, userId);
 		User user = ofy.load().key(userKey).now();
 		result = (user == null ? Result.NO_RECORD_FOUND : Result.RECORD_FOUND);
 		return user;

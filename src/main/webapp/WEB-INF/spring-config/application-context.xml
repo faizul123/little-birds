@@ -10,7 +10,7 @@
    http://www.springframework.org/schema/mvc
    http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-	<context:component-scan base-package="com.srvy.rest" />
+	<context:component-scan base-package="com.srvy.rest,com.srvy.exception" />
 	
 	<mvc:annotation-driven/>
 	
@@ -18,6 +18,7 @@
 	    <property name="daoMap">
 	        <map>
 				<entry key="com.srvy.dao.inf.UserDao" value="com.srvy.dao.impl.UserDaoImpl" />
+				<entry key="com.srvy.dao.inf.TopicDao" value="com.srvy.dao.impl.TopicDaoImpl" />
 			</map>
 	    </property>
 	</bean>
@@ -27,6 +28,8 @@
 	       <list>
 				<value>com.srvy.model.User</value>
 				<value>com.srvy.model.Profile</value>
+				<value>com.srvy.model.Topic</value>
+				<value>com.srvy.model.UserTopics</value>
 		   </list>
 	    </property>
 	</bean>

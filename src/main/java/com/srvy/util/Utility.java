@@ -28,10 +28,13 @@ public class Utility {
 		return (map == null || map.isEmpty());
 	}
 	
+	public static boolean isNullOrEmpty(String value){
+		return (value == null || value.isEmpty());
+	}
+	
 	public static String randomUUID(){
 		return UUID.randomUUID().toString();
 	}
-
 
 	/**
 	 * Used to print the exception
