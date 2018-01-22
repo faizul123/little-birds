@@ -1,4 +1,4 @@
-package com.srvy.backend.backend;
+package com.srvy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
