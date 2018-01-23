@@ -26,3 +26,4 @@ nbdist/
 #Other
 gitlab
 gitlab.pub
+.mvn
