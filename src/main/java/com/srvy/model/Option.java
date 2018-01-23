@@ -12,8 +12,9 @@ public class Option {
 	
 	private boolean isAnswered;
 
-	public Option(String opt) {
-		
+	public Option(String opt,int type) {
+		this.label = opt;
+		this.type = type;
 	}
 
 	public int getType() {
