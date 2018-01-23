@@ -32,7 +32,7 @@ public class SurveyDaoImpl extends BaseDaoImpl implements SurveyDao {
 	}
 
 	@Override
-	public List<Survey> viewMySurveyList(User user) {
+	public List<Survey> getSurveys(User user) {
 		
 		return ofy.load().type(Survey.class).filterKey("userId", user.getId()).list();
 	}

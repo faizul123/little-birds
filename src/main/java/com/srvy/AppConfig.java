@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import com.googlecode.objectify.ObjectifyFilter;
 import com.srvy.dao.DaoFactory;
 import com.srvy.dao.ObjectifyUtil;
+import com.srvy.helpers.UserRestHelper;
+import com.srvy.model.factory.ModelFactory;
 
 @Configuration
 public class AppConfig {
@@ -20,6 +22,11 @@ public class AppConfig {
 		factory.addDaoInfo("com.srvy.dao.inf.UserDao", "com.srvy.dao.impl.UserDaoImpl");
 		factory.addDaoInfo("com.srvy.dao.inf.TopicDao", "com.srvy.dao.impl.TopicDaoImpl");		
 		return factory;
+	}
+	
+	@Bean
+	public UserRestHelper userRestHelper(){
+		return new UserRestHelper();
 	}
 	
 	@Bean
@@ -34,12 +41,17 @@ public class AppConfig {
 		return ofyUtil;
 	}
 	
-	@Bean
 	/* Register filter for objectify */
+	@Bean	
 	public FilterRegistrationBean filterRegistrationBean(){
 		FilterRegistrationBean bean = new FilterRegistrationBean();
 		bean.setFilter(new ObjectifyFilter());
 		return bean;
+	}
+	
+	@Bean
+	public ModelFactory modelFactory(){
+		return new ModelFactory();
 	}
 	
 }

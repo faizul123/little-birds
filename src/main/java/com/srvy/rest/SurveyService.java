@@ -1,9 +1,9 @@
 package com.srvy.rest;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.ValidationException;
@@ -39,12 +39,14 @@ public class SurveyService {
 	@Autowired
 	private DaoFactory daoFactory;
 	
+	@Autowired
+	private UserRestHelper userRestHelper;
+	
+	@Autowired
+	private ModelFactory modelFactory;
+	
 	@RequestMapping(value="/survey",method=RequestMethod.POST)
-	public void createSurvey(HttpServletRequest request, @RequestBody SurveyRequestWrapper survey){
-		
-		ModelFactory modelFactory = new ModelFactory();
-		
-		UserRestHelper userRestHelper = new UserRestHelper();
+	public ResponseEntity<Map<String,Object>> createSurvey(HttpServletRequest request, @RequestBody SurveyRequestWrapper survey){
 		
 		try {
 		
@@ -60,9 +62,14 @@ public class SurveyService {
 			
 			userDao.writeBatch(questionsList);		
 			
+			return Response.newBuilder().add("message", "Successfully survey created").add("code", 200).build();
+			
 		} catch (Exception e) {
+			Logger.getLogger("").warning("err " + e.toString());
 			e.printStackTrace();
 		}
+		
+		return Response.newBuilder().add("message", "Couldn't save to survey").build();
 		
 	}
 	
@@ -83,47 +90,19 @@ public class SurveyService {
 		return null;
 	}
 
-	@RequestMapping(value = "/mysurvey", method = RequestMethod.GET)
-	public ResponseEntity<Map<String,Object>> mySurveyList() {
+	@RequestMapping(value = "/mysurveys", method = RequestMethod.GET)
+	public ResponseEntity<Map<String,Object>> mySurveyList(HttpServletRequest request) throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		
 		ResponseBuilder responseBuilder = Response.newBuilder();
-		try {
-			SurveyDao surveyDao = daoFactory.getDao(SurveyDao.class);
-			QuestionDao questionDao = daoFactory.getDao(QuestionDao.class);
+		
+			User user = userRestHelper.getLoginUser(request, daoFactory.getDao(UserDao.class));
 			
-			List<Survey> surveys = surveyDao.viewMySurveyList(new User());
+			SurveyDao surveyDao = daoFactory.getDao(SurveyDao.class);			
 			
-			int ct = 0;
-			responseBuilder.add("survey count", surveys.size());
-			for(Survey survey : surveys) {
-			List<Question> questions = questionDao.getSurveyQuestions(survey.getId());
-			
-			if(questions != null) {
-				Map<String,Object> surveyMap = new HashMap<>();
-				 	
-				surveyMap.put("title", survey.getTitle());
-				surveyMap.put("Total Questions", survey.getTotalQuestions());
-				
-				for(Question question : questions) {
-					Map<String,Object> questionMap = new HashMap<>();
-					
-					questionMap.put("type", question.getQuestionType());
-					questionMap.put("question", question.getQuestion());
-					questionMap.put("options", question.getOptions());
-				
-					surveyMap.put("question details", questionMap);
-				}
-				
-				responseBuilder.add(String.valueOf(ct), surveyMap);
-				ct++;
-				
-			}
-			
-			}
-			
-		} catch (Exception e) {
-
-		}
+			List<Survey> surveys = surveyDao.getSurveys(user);			 
+			responseBuilder.add("total", surveys.size());			
+			responseBuilder.add("surveys", surveys);			
+		
 		return responseBuilder.build();
 	}
 	

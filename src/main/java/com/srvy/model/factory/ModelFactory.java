@@ -1,7 +1,6 @@
 package com.srvy.model.factory;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -17,6 +16,7 @@ import com.srvy.model.User;
 import com.srvy.model.UserTopics;
 import com.srvy.request.model.FilterDetails;
 import com.srvy.request.model.QuestionDetails;
+import com.srvy.request.model.QuestionOptions;
 import com.srvy.request.model.SignupInfo;
 import com.srvy.request.model.SurveyDetails;
 import com.srvy.request.model.TopicInfo;
@@ -72,7 +72,7 @@ public class ModelFactory {
 	public Question newQuestion(QuestionDetails questionDetails, String surveyID) {
 		
 		Question question = new Question(surveyID, questionDetails.getQuestion(), 
-				questionDetails.getType(),newOptionSet(questionDetails.getChoices()));
+				questionDetails.getOptions().getType(),newOptionSet(questionDetails.getOptions()));
 		return question;
 	}
 	
@@ -90,13 +90,9 @@ public class ModelFactory {
 		return new Filters(filterDetails.getFilterName(), filterDetails.getFilterVal(), filterDetails.getFilterType(), surveyID);
 	}
 	
-	public Set<Option> newOptionSet(Set<String> options) {
-		Set<Option> optionSet = new HashSet<>();
-		for(String opt : options) {
-			optionSet.add(new Option(opt));
-		}
-		return optionSet;
+	public Set<Option> newOptionSet(QuestionOptions options) {
+		OptionBuilder optBuilder = new OptionBuilder(options);
+		return optBuilder.getOptions();
 	}
-	
-	
+		
 }

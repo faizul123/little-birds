@@ -13,7 +13,7 @@ public class Option {
 	private boolean isAnswered;
 
 	public Option(String opt) {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public int getType() {

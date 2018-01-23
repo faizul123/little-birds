@@ -29,4 +29,8 @@ public class ExceptionResolver {
 				.build();
 	}
 	
+	public ResponseEntity<Map<String,Object>> handleClassNotFoundException(ClassNotFoundException e){
+		return Response.newBuilder().status(HttpStatus.BAD_REQUEST).add("error", new Error(400,e.getMessage(),"","")).build();
+	}
+	
 }

@@ -17,7 +17,7 @@ public interface SurveyDao extends BaseDao {
 	
 	public boolean createSurvey(Survey survey);
 	
-	public List<Survey> viewMySurveyList(User user);
+	public List<Survey> getSurveys(User user);
 	
 	public void deleteSurvey(Survey survey);
 	
